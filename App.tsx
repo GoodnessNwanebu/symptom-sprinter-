@@ -357,7 +357,7 @@ const App: React.FC = () => {
   // 3. Playing or Round Over
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-medical-500 to-medical-900">
-      {/* Header */}
+      {/* Header - Fixed at top */}
       <Header 
         username={username}
         onUsernameSave={handleUsernameSave}
@@ -368,15 +368,15 @@ const App: React.FC = () => {
         onPause={() => { /* Simple pause not fully implemented for brevity */ }}
       />
 
-      {/* Main Game Area */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-3 gap-3 min-h-0 overflow-hidden">
+      {/* Main Game Area - Scrollable content below fixed header */}
+      <main className="flex-1 flex flex-col items-center px-4 py-3 gap-3 overflow-y-auto pt-[72px] md:pt-[80px]">
         {/* Diagnosis Banner */}
         {roundData && (
           <DiagnosisBanner diagnosis={roundData.diagnosis} />
         )}
 
         {/* Game Grid - Responsive sizing to fit screen */}
-        <div className="w-full max-w-md grid grid-cols-3 gap-2 md:gap-3 auto-rows-fr flex-shrink-0" style={{ maxHeight: 'calc(100vh - 280px)' }}>
+        <div className="w-full max-w-md grid grid-cols-3 gap-2 md:gap-3 auto-rows-fr flex-shrink-0 pb-4">
             {tiles.map((tile: TileData) => (
                 <Tile 
                     key={tile.id} 

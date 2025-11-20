@@ -58,13 +58,13 @@ export const UsernameEditor: React.FC<UsernameEditorProps> = ({
           onChange={(e) => setUsername(e.target.value)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          className="bg-white/90 backdrop-blur-sm px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold text-slate-800 border-2 border-medical-400 focus:border-medical-500 focus:outline-none shadow-sm min-w-[80px] md:min-w-[100px]"
+          className="bg-white/90 backdrop-blur-sm px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl text-sm md:text-sm font-bold text-slate-800 border-2 border-medical-400 focus:border-medical-500 focus:outline-none shadow-sm min-w-[80px] md:min-w-[100px]"
           maxLength={20}
         />
       ) : (
         <button
           onClick={handleClick}
-          className="bg-white/90 backdrop-blur-sm px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold text-slate-800 active:bg-white md:hover:bg-white transition-colors shadow-sm border-2 border-transparent active:border-medical-200 md:hover:border-medical-200 flex items-center gap-1 md:gap-1.5 group"
+          className="bg-white/90 backdrop-blur-sm px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl text-sm md:text-sm font-bold text-slate-800 active:bg-white md:hover:bg-white transition-colors shadow-sm border-2 border-transparent active:border-medical-200 md:hover:border-medical-200 flex items-center gap-1 md:gap-1.5 group"
         >
           <span className="truncate max-w-[70px] md:max-w-[120px] text-left">{username}</span>
           <svg 

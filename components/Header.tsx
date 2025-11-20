@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({
   highScore,
   combo}) => {
   return (
-    <div className="w-full bg-white/90 backdrop-blur-sm shadow-lg z-20 rounded-b-2xl md:rounded-b-3xl px-2 md:px-4 py-2 md:py-3 flex-shrink-0">
+    <div className="fixed top-0 left-0 right-0 w-full bg-white/90 backdrop-blur-sm shadow-lg z-20 rounded-b-2xl md:rounded-b-3xl px-2 md:px-4 py-2 md:py-3 flex-shrink-0">
       
       {/* Mobile Layout: Single row, more compact */}
       <div className="flex md:hidden items-center justify-between gap-1.5">
@@ -38,14 +38,14 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex-1 flex items-center justify-center gap-1.5 min-w-0">
           {/* Total Score */}
           <div className="bg-medical-50 rounded-lg px-2 py-1 border-2 border-medical-200 shadow-sm">
-            <p className="text-[8px] font-bold text-slate-500 uppercase mb-0.5 leading-none">Total</p>
-            <p className="text-base font-black text-medical-600 leading-none">{score}</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase mb-0.5 leading-none">Total</p>
+            <p className="text-lg font-black text-medical-600 leading-none">{score}</p>
           </div>
           
           {/* High Score */}
           <div className="bg-yellow-50 rounded-lg px-2 py-1 border-2 border-yellow-200 shadow-sm">
-            <p className="text-[8px] font-bold text-slate-500 uppercase mb-0.5 leading-none">Best</p>
-            <p className="text-base font-black text-yellow-600 leading-none">{highScore}</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase mb-0.5 leading-none">Best</p>
+            <p className="text-lg font-black text-yellow-600 leading-none">{highScore}</p>
           </div>
         </div>
 
@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Combo Indicator (mobile: very small, only when active) */}
           {combo > 1 && (
             <div className="flex flex-col items-center">
-              <span className="text-[7px] font-black text-orange-500 uppercase leading-none">C</span>
+              <span className="text-[9px] font-black text-orange-500 uppercase leading-none">C</span>
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className={`w-1 h-1 rounded-full ${i < combo ? 'bg-orange-500' : 'bg-slate-300'}`} />
@@ -67,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
           <CircularTimer 
             timeRemaining={timeRemaining} 
             totalTime={GAME_CONSTANTS.ROUND_DURATION}
-            size={48}
+            size={50}
           />
           
           {/* Pause Button (smaller on mobile) */}
