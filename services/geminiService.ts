@@ -1,81 +1,47 @@
-import { GoogleGenAI, Type } from "@google/genai";
 import { RoundData, TileData, TileState } from "../types";
 import { GAME_CONSTANTS } from "../constants";
+import { supabase } from "./supabase";
 
-const modelId = 'gemini-flash-lite-latest';
-
-// Lazy initialization to avoid crashing if API key is missing
-let ai: GoogleGenAI | null = null;
-
-const getAI = (): GoogleGenAI => {
-  if (!ai) {
-    const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not set. Please add it to your .env.local file.");
-    }
-    ai = new GoogleGenAI({ apiKey });
-  }
-  return ai;
-};
-
-export const generateRoundData = async (): Promise<RoundData> => {
-  const prompt = `
-    Create a round for a medical trivia game called "Symptom Sprinter".
-    
-    1. Pick a specific medical diagnosis (Disease).
-    2. Provide exactly 12 short phrases (1-4 words each) that could appear on game tiles.
-    3. Approximately ${GAME_CONSTANTS.CORRECT_COUNT_TARGET} phrases must be CORRECT (relevant symptoms, signs, risk factors, or investigations for the diagnosis).
-    4. The remaining phrases must be INCORRECT (distractors, irrelevant to this specific diagnosis).
-    5. Ensure the distractors are medically plausible but clearly wrong for this specific condition.
-    
-    Output JSON.
-  `;
-
+export const generateRoundData = async (recentDiagnoses: string[] = []): Promise<RoundData> => {
   try {
-    const aiInstance = getAI();
-    const response = await aiInstance.models.generateContent({
-      model: modelId,
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            diagnosis: { type: Type.STRING },
-            category: { type: Type.STRING, description: "e.g. Cardiology, Neurology" },
-            difficulty: { type: Type.STRING, enum: ["Easy", "Medium", "Hard"] },
-            items: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  text: { type: Type.STRING },
-                  isRelevant: { type: Type.BOOLEAN }
-                },
-                required: ["text", "isRelevant"]
-              }
-            }
-          },
-          required: ["diagnosis", "items", "category"]
-        }
+    // Check if Supabase is configured (use any to access env vars)
+    const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL;
+    if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
+      throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local');
+    }
+
+    // Call Supabase Edge Function to proxy Gemini API (hides API key)
+    const { data, error } = await supabase.functions.invoke('generate-round', {
+      body: {
+        recentDiagnoses,
+        correctCountTarget: GAME_CONSTANTS.CORRECT_COUNT_TARGET
       }
     });
 
-    const text = response.text;
-    if (!text) throw new Error("No response from Gemini");
-
-    const rawData = JSON.parse(text);
+    if (error) {
+      console.error('Supabase Edge Function error:', error);
+      throw error;
+    }
     
-    // Transform to internal format
-    const tiles: TileData[] = rawData.items.map((item: any, index: number) => ({
-      id: `tile-${Date.now()}-${index}`,
-      text: item.text,
-      isRelevant: item.isRelevant,
+    if (!data) {
+      throw new Error("No response from generate-round function");
+    }
+
+    // If the function returns an error, throw it
+    if (data.error) {
+      console.error('Edge Function returned error:', data.error);
+      throw new Error(data.error);
+    }
+
+    const rawData = data;
+    
+    // Transform tiles from Edge Function response to internal format
+    const finalTiles: TileData[] = rawData.tiles.map((tile: any) => ({
+      id: tile.id,
+      text: tile.text,
+      isRelevant: tile.isRelevant,
       state: TileState.IDLE
     }));
-
-    // Ensure exactly 12 tiles by slicing or padding (though schema should handle it)
-    const finalTiles = tiles.slice(0, 12).sort(() => Math.random() - 0.5);
 
     return {
       diagnosis: rawData.diagnosis,
@@ -84,8 +50,16 @@ export const generateRoundData = async (): Promise<RoundData> => {
       tiles: finalTiles
     };
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to generate round:", error);
+    
+    // Provide helpful error message
+    if (error?.message?.includes('Supabase is not configured')) {
+      console.warn('⚠️ Supabase not configured. Using fallback data.');
+    } else if (error?.status === 401 || error?.code === '401') {
+      console.warn('⚠️ 401 Unauthorized - Check your VITE_SUPABASE_ANON_KEY in .env.local');
+    }
+    
     throw error;
   }
 };

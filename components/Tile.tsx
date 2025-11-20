@@ -19,7 +19,7 @@ export const Tile: React.FC<TileProps> = ({ data, onClick, disabled }) => {
 
   switch (data.state) {
     case TileState.IDLE:
-      colorClasses = "bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-100 border-b-4 border-slate-300 dark:border-slate-900 active:border-b-0 active:translate-y-1 shadow-sm";
+      colorClasses = "bg-white text-slate-700 border-b-4 border-slate-300 active:border-b-0 active:translate-y-1 shadow-sm";
       if (!disabled) {
         colorClasses += " hover:brightness-95 active:brightness-90 cursor-pointer";
       } else {
@@ -29,7 +29,7 @@ export const Tile: React.FC<TileProps> = ({ data, onClick, disabled }) => {
 
     case TileState.CORRECT:
       // Green success state
-      colorClasses = "bg-medical-500 text-white border-b-0 translate-y-1 shadow-inner ring-4 ring-medical-200 dark:ring-medical-900";
+      colorClasses = "bg-medical-500 text-white border-b-0 translate-y-1 shadow-inner ring-4 ring-medical-200";
       transformClasses = "animate-bounce-slight";
       break;
 
@@ -41,7 +41,7 @@ export const Tile: React.FC<TileProps> = ({ data, onClick, disabled }) => {
 
     case TileState.MISSED:
         // Show what they missed
-        colorClasses = "bg-medical-100 dark:bg-slate-800 text-medical-600 dark:text-medical-400 border-2 border-dashed border-medical-400";
+        colorClasses = "bg-medical-100 text-medical-600 border-2 border-dashed border-medical-400";
         break;
   }
 
