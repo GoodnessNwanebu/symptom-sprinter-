@@ -297,7 +297,7 @@ const App: React.FC = () => {
   // 1. Menu
   if (gameStatus === GameStatus.MENU) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-medical-500 to-medical-900 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      <div className="h-screen bg-gradient-to-br from-medical-500 to-medical-900 flex flex-col items-center justify-center p-6 relative overflow-hidden">
         
         {/* Background Decor */}
         <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>

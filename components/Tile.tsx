@@ -51,7 +51,7 @@ export const Tile: React.FC<TileProps> = ({ data, onClick, disabled }) => {
       className={`${baseClasses} ${colorClasses} ${transformClasses}`}
       disabled={disabled || data.state !== TileState.IDLE}
     >
-      <span className="drop-shadow-sm leading-tight break-words">
+      <span className="drop-shadow-sm leading-tight break-words min-w-0 w-full px-1" style={{ overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto' }}>
         {data.text}
       </span>
       
