@@ -1,0 +1,5 @@
+{
+  "name": "Symptom Sprinter",
+  "description": "A fast-paced tile game for health professionals. Diagnose diseases by racing against the clock to pick the correct symptoms and signs.",
+  "requestFramePermissions": []
+}
