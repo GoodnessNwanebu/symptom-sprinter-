@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { RoundData, GameStatus, TileData, TileState } from './types';
 import { GAME_CONSTANTS, SCORING, FALLBACK_ROUNDS } from './constants';
 import { generateRoundData } from './services/geminiService';
+import { getPlayerRecentDiagnoses, savePlayerDiagnosis } from './services/playerService';
 import { Tile } from './components/Tile';
 import { Header } from './components/Header';
 import { LoadingScreen } from './components/LoadingScreen';
@@ -46,6 +47,25 @@ const App: React.FC = () => {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // -- Effects --
+
+  // Prevent body scrolling on menu screen
+  useEffect(() => {
+    if (gameStatus === GameStatus.MENU) {
+      // Disable scrolling on menu
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      // Enable scrolling on game screen
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    
+    // Cleanup: restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [gameStatus]);
 
   // Load total score and high score from localStorage
   useEffect(() => {
@@ -102,26 +122,8 @@ const App: React.FC = () => {
 
   // -- Handlers --
 
-  // Helper to get recent diagnoses from localStorage for variety
-  const getRecentDiagnoses = (): string[] => {
-    try {
-      const saved = localStorage.getItem('symptom_sprinter_recent_diagnoses');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  };
-
-  // Helper to save a new diagnosis to recent list (keep last 10)
-  const saveRecentDiagnosis = (diagnosis: string) => {
-    try {
-      const recent = getRecentDiagnoses();
-      const updated = [diagnosis, ...recent.filter(d => d !== diagnosis)].slice(0, 10);
-      localStorage.setItem('symptom_sprinter_recent_diagnoses', JSON.stringify(updated));
-    } catch {
-      // Silently fail if localStorage is unavailable
-    }
-  };
+  // Note: Using player-specific diagnosis tracking via playerService
+  // Each player has their own history of last 20 diagnoses
 
   const startGame = async () => {
     setGameStatus(GameStatus.LOADING_ROUND);
@@ -132,10 +134,10 @@ const App: React.FC = () => {
     setSessionStartScore(currentTotalScore); // Track session start for high score calculation
     setCombo(0);
     try {
-      // Get recent diagnoses to avoid repetition
-      const recentDiagnoses = getRecentDiagnoses();
+      // Get player-specific recent diagnoses to avoid repetition
+      const recentDiagnoses = getPlayerRecentDiagnoses();
       const data = await generateRoundData(recentDiagnoses);
-      saveRecentDiagnosis(data.diagnosis); // Save for future rounds
+      savePlayerDiagnosis(data.diagnosis); // Save to player's history
       startRound(data);
     } catch (e) {
       console.warn("Using fallback data due to API error");
@@ -271,10 +273,10 @@ const App: React.FC = () => {
      // Keep total score, new round
      setGameStatus(GameStatus.LOADING_ROUND);
      try {
-         // Get recent diagnoses to avoid repetition
-         const recentDiagnoses = getRecentDiagnoses();
+         // Get player-specific recent diagnoses to avoid repetition
+         const recentDiagnoses = getPlayerRecentDiagnoses();
          const data = await generateRoundData(recentDiagnoses);
-         saveRecentDiagnosis(data.diagnosis); // Save for future rounds
+         savePlayerDiagnosis(data.diagnosis); // Save to player's history
          // Reset time but keep total score (persists across rounds)
          setRoundData(data);
          setTiles(data.tiles);
