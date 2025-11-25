@@ -1,7 +1,7 @@
 import { RoundData, TileState } from './types';
 
 export const GAME_CONSTANTS = {
-  ROUND_DURATION: 15, // Seconds
+  ROUND_DURATION: 10, // Seconds
   TOTAL_TILES: 12,
   CORRECT_COUNT_TARGET: 7, // Aim for 7 correct, 5 incorrect
 };
