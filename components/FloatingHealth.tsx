@@ -45,3 +45,4 @@ export const FloatingHealth: React.FC<FloatingHealthProps> = ({ val, x, y, onCom
   );
 };
 
+
