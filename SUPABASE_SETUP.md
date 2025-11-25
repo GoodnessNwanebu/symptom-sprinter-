@@ -11,13 +11,15 @@ This guide will help you set up Supabase for the Symptom Sprinter leaderboard an
 ## 2. Set Up Database Schema
 
 1. Go to **SQL Editor** in your Supabase dashboard
-2. Copy and paste the contents of `supabase/schema.sql`
-3. Click **Run** to execute the SQL
+2. Copy and paste the contents of `supabase/schema.sql` and click **Run**
+3. Copy and paste the contents of `supabase/users_tracking.sql` and click **Run**
 
 This will create:
 - `leaderboard` table with indexes
+- `users` table for tracking unique players
 - Row Level Security policies
-- Automatic `updated_at` timestamp trigger
+- Automatic `updated_at` timestamp triggers
+- Helper functions for user tracking
 
 ## 3. Get Supabase Credentials
 
@@ -115,10 +117,41 @@ supabase functions deploy generate-round
 - The Edge Function keeps your API key server-side
 - Never commit `.env.local` to git (it's in `.gitignore`)
 
+## User Tracking & Analytics
+
+The app automatically tracks unique players for analytics:
+
+- **Automatic tracking**: When a player first visits, their UUID is saved to the `users` table
+- **Session tracking**: Each time a player returns, `last_seen` and `session_count` are updated
+- **Round tracking**: Each round played increments `total_rounds_played`
+- **Privacy**: Only UUIDs are stored (no personal information)
+
+### Querying User Stats
+
+You can query user statistics from the Supabase dashboard:
+
+```sql
+-- Total unique users
+SELECT COUNT(*) FROM users;
+
+-- Active users (last 7 days)
+SELECT COUNT(*) FROM users 
+WHERE last_seen > NOW() - INTERVAL '7 days';
+
+-- Users by signup date (growth)
+SELECT DATE(first_seen) as date, COUNT(*) as new_users
+FROM users
+GROUP BY DATE(first_seen)
+ORDER BY date DESC;
+```
+
+**Note**: The `users` table has RLS enabled with no public read access for privacy. To query it, you'll need to use the Supabase dashboard SQL editor or a service role key.
+
 ## Security Notes
 
 - The `anon` key is safe to expose client-side (it's public)
 - RLS policies protect your database
 - The Gemini API key is stored as a secret and never exposed to clients
 - All sensitive operations happen server-side in the Edge Function
+- User tracking only stores anonymous UUIDs (no PII)
 

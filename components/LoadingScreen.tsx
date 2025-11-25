@@ -2,9 +2,60 @@ import React from 'react';
 
 interface LoadingScreenProps {
   message?: string;
+  error?: string;
+  retryCount?: number;
+  onRetry?: () => void;
+  onGoHome?: () => void;
 }
 
-export const LoadingScreen: React.FC<LoadingScreenProps> = ({ message = "Consulting Medical Archives..." }) => {
+export const LoadingScreen: React.FC<LoadingScreenProps> = ({ 
+  message = "Consulting Medical Archives...",
+  error,
+  retryCount,
+  onRetry,
+  onGoHome
+}) => {
+  // Error state - show network error message
+  if (error) {
+    return (
+      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-medical-500 to-medical-900 text-white p-6">
+        
+        {/* Error Icon */}
+        <div className="text-6xl mb-6">⚠️</div>
+
+        <h2 className="text-2xl font-black tracking-tight mb-4 text-center">
+          NETWORK ERROR
+        </h2>
+        
+        <div className="max-w-md text-center mb-6 space-y-3">
+          <p className="text-lg font-medium opacity-90">
+            {error}
+          </p>
+          {retryCount !== undefined && retryCount > 0 && (
+            <p className="text-sm opacity-75">
+              Retry attempt {4 - retryCount} of 3. Please wait...
+            </p>
+          )}
+          {retryCount === 0 && (
+            <p className="text-sm opacity-75">
+              All retry attempts failed. Please check your connection and try again.
+            </p>
+          )}
+        </div>
+
+        {onGoHome && (
+          <button
+            onClick={onGoHome}
+            className="px-6 py-3 bg-white text-medical-600 rounded-xl font-bold shadow-lg hover:bg-gray-100 transition-colors"
+          >
+            Return to Home
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // Normal loading state
   return (
     <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-medical-500 to-medical-900 text-white">
       

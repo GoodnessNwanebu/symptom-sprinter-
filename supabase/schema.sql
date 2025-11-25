@@ -8,8 +8,11 @@ CREATE TABLE IF NOT EXISTS leaderboard (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()) NOT NULL
 );
 
--- Create index on total_score for fast leaderboard queries
+-- Create index on total_score for fast leaderboard queries (kept for backward compatibility)
 CREATE INDEX IF NOT EXISTS idx_leaderboard_total_score ON leaderboard(total_score DESC);
+
+-- Create index on high_score for fast leaderboard queries (primary metric)
+CREATE INDEX IF NOT EXISTS idx_leaderboard_high_score ON leaderboard(high_score DESC);
 
 -- Create index on username for fast lookups
 CREATE INDEX IF NOT EXISTS idx_leaderboard_username ON leaderboard(username);

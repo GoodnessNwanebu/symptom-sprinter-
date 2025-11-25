@@ -13,6 +13,17 @@ export const SCORING = {
   PERFECT_ROUND_BONUS: 100, // All correct consecutively (or just all correct found without errors)
 };
 
+export const HEALTH = {
+  STARTING_HEALTH: 100,
+  WRONG_CLICK_PENALTY: -15,
+  COMBO_HEALTH_BONUS: 15,
+  MAX_HEALTH: 100,
+  // Color zones
+  GREEN_THRESHOLD: 60, // 60-100: Green
+  YELLOW_THRESHOLD: 30, // 30-59: Yellow/Amber
+  // 0-29: Red
+};
+
 // Used for initial loading or fallback
 export const FALLBACK_ROUNDS: RoundData[] = [
   {

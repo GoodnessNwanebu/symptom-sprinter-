@@ -20,17 +20,32 @@ export const generateRoundData = async (recentDiagnoses: string[] = []): Promise
 
     if (error) {
       console.error('Supabase Edge Function error:', error);
-      throw error;
+      // Check error status/code - Supabase errors can have status or statusCode
+      const errorStatus = (error as any)?.status || (error as any)?.statusCode || (error as any)?.code;
+      
+      // Create error object with status code for better handling
+      const errorWithStatus = error as any;
+      errorWithStatus.status = errorStatus || 500;
+      errorWithStatus.isNetworkError = errorStatus >= 500 || !errorStatus; // Treat unknown errors as network errors
+      throw errorWithStatus;
     }
     
     if (!data) {
-      throw new Error("No response from generate-round function");
+      const noDataError: any = new Error("No response from generate-round function");
+      noDataError.status = 500;
+      noDataError.isNetworkError = true;
+      throw noDataError;
     }
 
-    // If the function returns an error, throw it
+    // If the function returns an error, check if it includes status
     if (data.error) {
       console.error('Edge Function returned error:', data.error);
-      throw new Error(data.error);
+      const errorMessage = typeof data.error === 'string' ? data.error : data.error.message || 'Unknown error';
+      const errorStatus = data.error?.status || data.status || 500;
+      const functionError: any = new Error(errorMessage);
+      functionError.status = errorStatus;
+      functionError.isNetworkError = errorStatus >= 500;
+      throw functionError;
     }
 
     const rawData = data;
@@ -52,6 +67,25 @@ export const generateRoundData = async (recentDiagnoses: string[] = []): Promise
 
   } catch (error: any) {
     console.error("Failed to generate round:", error);
+    
+    // Handle network-level errors (TypeError from fetch failures)
+    if (error instanceof TypeError) {
+      const networkError: any = new Error("Network error. Please check your internet connection.");
+      networkError.status = 500;
+      networkError.isNetworkError = true;
+      networkError.originalError = error;
+      throw networkError;
+    }
+    
+    // Ensure error has status and isNetworkError flag
+    if (error) {
+      const errorStatus = error.status || error.statusCode || error.code;
+      error.status = errorStatus || 500;
+      error.isNetworkError = errorStatus >= 500 || !errorStatus || 
+                            error.message?.toLowerCase().includes('network') ||
+                            error.message?.toLowerCase().includes('connection') ||
+                            error.message?.toLowerCase().includes('timeout');
+    }
     
     // Provide helpful error message
     if (error?.message?.includes('Supabase is not configured')) {

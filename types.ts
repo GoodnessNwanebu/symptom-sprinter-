@@ -24,6 +24,7 @@ export enum GameStatus {
   LOADING_ROUND = 'LOADING_ROUND',
   PLAYING = 'PLAYING',
   ROUND_OVER = 'ROUND_OVER',
+  REVEAL = 'REVEAL', // Shows all correct tiles for learning
   GAME_OVER = 'GAME_OVER',
 }
 

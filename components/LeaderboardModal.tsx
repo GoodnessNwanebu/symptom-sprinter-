@@ -1,6 +1,6 @@
 import React from 'react';
 
-// LEADERBOARD DISABLED - Currently showing "Coming Soon!" message
+// LEADERBOARD DISABLED - Showing "Coming Soon!" message until we have enough users
 // To re-enable: Uncomment the imports and full implementation below, then uncomment submitScore in App.tsx
 
 // import { useState, useEffect } from 'react';
@@ -9,7 +9,7 @@ import React from 'react';
 interface LeaderboardModalProps {
   onClose: () => void;
   currentUsername?: string;
-  currentTotalScore?: number;
+  currentHighScore?: number;
 }
 
 export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) => {
@@ -30,7 +30,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) =
           </p>
           
           <p className="text-sm text-center text-slate-500 mb-6">
-            Compete with players worldwide and see how you rank.
+            Compete with players worldwide and see how you rank. We're building up our player base first!
           </p>
           
           <button 
@@ -52,7 +52,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) =
 
   useEffect(() => {
     loadLeaderboard();
-  }, []);
+  }, [currentUsername]);
 
   const loadLeaderboard = async () => {
     setLoading(true);
@@ -126,8 +126,8 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose }) =
                     </span>
                   </div>
                   <div className="text-right flex-shrink-0 ml-2">
-                    <div className="font-black text-medical-600">{formatScore(entry.total_score)}</div>
-                    <div className="text-xs text-slate-500">Best: {formatScore(entry.high_score)}</div>
+                    <div className="font-black text-medical-600">{formatScore(entry.high_score)}</div>
+                    <div className="text-xs text-slate-500">High Score</div>
                   </div>
                 </div>
               );
